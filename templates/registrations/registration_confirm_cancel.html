@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Cancel Registration | EventHub{% endblock %}
+
+{% block content %}
+<div class="container section-padding">
+    <div class="confirm-card text-center">
+        <div class="warning-icon-wrap text-pink">
+            <i class="fa-solid fa-circle-xmark"></i>
+        </div>
+        <h2>Cancel Registration?</h2>
+        <p class="confirm-desc">
+            Are you sure you want to cancel your registration for <strong>"{{ registration.event.title }}"</strong>?
+            This will release your reserved seat back to the available seat pool.
+        </p>
+
+        <form method="POST" class="mt-4">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-lg"><i class="fa-solid fa-ban"></i> Yes, Cancel Registration</button>
+            <a href="{% url 'participant_dashboard' %}" class="btn btn-outline btn-lg ml-2">Keep Registration</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

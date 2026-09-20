@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Account Profile | EventHub{% endblock %}
+
+{% block content %}
+<div class="page-header-banner">
+    <div class="container">
+        <h1 class="page-title">Profile Settings</h1>
+        <p class="page-subtitle">Manage your contact information, profile bio, and organization details</p>
+    </div>
+</div>
+
+<div class="container section-padding">
+    <div class="profile-layout-grid">
+        <!-- Sidebar Info -->
+        <div class="profile-summary-card">
+            <div class="avatar-large">
+                <i class="fa-solid fa-user"></i>
+            </div>
+            <h2>{{ user.get_full_name|default:user.username }}</h2>
+            <p class="user-email-text"><i class="fa-solid fa-envelope"></i> {{ user.email }}</p>
+            <div class="role-badge-wrap mt-3">
+                {% if is_organizer %}
+                    <span class="badge badge-purple-lg"><i class="fa-solid fa-building-user"></i> Event Organizer</span>
+                {% else %}
+                    <span class="badge badge-blue-lg"><i class="fa-solid fa-user-check"></i> Event Participant</span>
+                {% endif %}
+            </div>
+            <p class="joined-date-text mt-3">Member since {{ user.date_joined|date:"M Y" }}</p>
+        </div>
+
+        <!-- Form Edit Area -->
+        <div class="profile-form-card">
+            <h2 class="form-section-title"><i class="fa-solid fa-user-gear"></i> Update Personal Details</h2>
+            <form method="POST" enctype="multipart/form-data" class="custom-form">
+                {% csrf_token %}
+
+                <div class="form-grid">
+                    <div class="form-group col-span-half">
+                        <label for="{{ user_form.first_name.id_for_label }}" class="form-label">First Name</label>
+                        {{ user_form.first_name }}
+                    </div>
+
+                    <div class="form-group col-span-half">
+                        <label for="{{ user_form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                        {{ user_form.last_name }}
+                    </div>
+
+                    <div class="form-group col-span-full">
+                        <label for="{{ user_form.email.id_for_label }}" class="form-label">Email Address <span class="required-asterisk">*</span></label>
+                        {{ user_form.email }}
+                        {% if user_form.email.errors %}<div class="form-error">{{ user_form.email.errors }}</div>{% endif %}
+                    </div>
+
+                    {% if is_organizer %}
+                        <div class="form-group col-span-full">
+                            <label for="{{ profile_form.organization_name.id_for_label }}" class="form-label">Organization Name <span class="required-asterisk">*</span></label>
+                            {{ profile_form.organization_name }}
+                        </div>
+
+                        <div class="form-group col-span-half">
+                            <label for="{{ profile_form.phone.id_for_label }}" class="form-label">Phone Number</label>
+                            {{ profile_form.phone }}
+                        </div>
+
+                        <div class="form-group col-span-half">
+                            <label for="{{ profile_form.website.id_for_label }}" class="form-label">Organization Website</label>
+                            {{ profile_form.website }}
+                        </div>
+
+                        <div class="form-group col-span-full">
+                            <label for="{{ profile_form.organization_description.id_for_label }}" class="form-label">Organization Description</label>
+                            {{ profile_form.organization_description }}
+                        </div>
+                    {% else %}
+                        <div class="form-group col-span-full">
+                            <label for="{{ profile_form.phone.id_for_label }}" class="form-label">Phone Number</label>
+                            {{ profile_form.phone }}
+                        </div>
+
+                        <div class="form-group col-span-full">
+                            <label for="{{ profile_form.bio.id_for_label }}" class="form-label">Personal Bio / Info</label>
+                            {{ profile_form.bio }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-actions mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg"><i class="fa-solid fa-floppy-disk"></i> Save Profile Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

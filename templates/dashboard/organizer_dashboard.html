@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Organizer Dashboard | EventHub{% endblock %}
+
+{% block content %}
+<div class="page-header-banner">
+    <div class="container page-header-flex">
+        <div>
+            <h1 class="page-title">Organizer Dashboard</h1>
+            <p class="page-subtitle">Track seat availability, manage events, and view registered participants</p>
+        </div>
+        <div>
+            <a href="{% url 'create_event' %}" class="btn btn-white btn-lg"><i class="fa-solid fa-plus-circle"></i> Create New Event</a>
+        </div>
+    </div>
+</div>
+
+<div class="container section-padding">
+    <!-- Organizer Stat Counter Cards -->
+    <div class="stats-grid">
+        <div class="stat-card stat-purple">
+            <div class="stat-icon"><i class="fa-solid fa-calendar-days"></i></div>
+            <div class="stat-info">
+                <span class="stat-value">{{ total_events }}</span>
+                <span class="stat-label">Total Events</span>
+            </div>
+        </div>
+
+        <div class="stat-card stat-green">
+            <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="stat-info">
+                <span class="stat-value">{{ approved_events }}</span>
+                <span class="stat-label">Approved Events</span>
+            </div>
+        </div>
+
+        <div class="stat-card stat-yellow">
+            <div class="stat-icon"><i class="fa-solid fa-clock"></i></div>
+            <div class="stat-info">
+                <span class="stat-value">{{ pending_events }}</span>
+                <span class="stat-label">Pending Approval</span>
+            </div>
+        </div>
+
+        <div class="stat-card stat-pink">
+            <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+            <div class="stat-info">
+                <span class="stat-value">{{ total_registrations }}</span>
+                <span class="stat-label">Total Registrations</span>
+            </div>
+        </div>
+
+        <div class="stat-card stat-blue">
+            <div class="stat-icon"><i class="fa-solid fa-chair"></i></div>
+            <div class="stat-info">
+                <span class="stat-value">{{ total_available_seats }}</span>
+                <span class="stat-label">Total Available Seats</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Organizer Events Table -->
+    <div class="dashboard-table-card mt-5">
+        <div class="card-header-flex">
+            <h2><i class="fa-solid fa-list-check"></i> Manage Your Events</h2>
+            <a href="{% url 'create_event' %}" class="btn btn-sm btn-primary"><i class="fa-solid fa-plus"></i> Add Event</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Event Title</th>
+                        <th>Category</th>
+                        <th>Date & Time</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Seats / Registrations</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                        <tr>
+                            <td class="fw-bold">
+                                <a href="{% url 'event_detail' slug=event.slug %}" class="table-event-link">{{ event.title }}</a>
+                            </td>
+                            <td><span class="category-pill-sm">{{ event.category.name|default:'General' }}</span></td>
+                            <td>
+                                <div><i class="fa-regular fa-calendar"></i> {{ event.date|date:"M d, Y" }}</div>
+                                <div class="text-muted small"><i class="fa-regular fa-clock"></i> {{ event.start_time|time:"P" }}</div>
+                            </td>
+                            <td><i class="fa-solid fa-location-dot"></i> {{ event.location }}</td>
+                            <td>
+                                {% if event.status == 'approved' %}
+                                    <span class="badge badge-success"><i class="fa-solid fa-check"></i> Approved</span>
+                                {% elif event.status == 'pending' %}
+                                    <span class="badge badge-warning"><i class="fa-solid fa-clock"></i> Pending Approval</span>
+                                {% else %}
+                                    <span class="badge badge-danger"><i class="fa-solid fa-xmark"></i> Rejected</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="seats-mini-progress">
+                                    <div class="seats-num"><strong>{{ event.registered_count }}</strong> / {{ event.capacity }} registered</div>
+                                    <div class="text-muted small">({{ event.available_seats }} seats left)</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="action-buttons-group">
+                                    <a href="{% url 'event_participants' slug=event.slug %}" class="btn btn-sm btn-info" title="View Participants Roster"><i class="fa-solid fa-users"></i> Roster</a>
+                                    <a href="{% url 'edit_event' slug=event.slug %}" class="btn btn-sm btn-warning" title="Edit Event"><i class="fa-solid fa-pen"></i> Edit</a>
+                                    <a href="{% url 'delete_event' slug=event.slug %}" class="btn btn-sm btn-danger-outline" title="Delete Event"><i class="fa-solid fa-trash"></i> Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">
+                                <i class="fa-solid fa-folder-open text-xl mb-2 d-block"></i>
+                                You haven't created any events yet. Click "Create New Event" to launch your first event!
+                                <div class="mt-3">
+                                    <a href="{% url 'create_event' %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Create New Event</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

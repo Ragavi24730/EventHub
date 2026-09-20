@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Log In | EventHub{% endblock %}
+
+{% block content %}
+<div class="auth-page-container">
+    <div class="auth-card">
+        <div class="auth-card-header text-center">
+            <a href="{% url 'home' %}" class="auth-logo"><i class="fa-solid fa-ticket-simple"></i> Event<span class="accent-text">Hub</span></a>
+            <h2>Welcome Back</h2>
+            <p>Log in to access your registered tickets or organizer dashboard</p>
+        </div>
+
+        <form method="POST" action="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="custom-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="id_username" class="form-label">Username</label>
+                <div class="input-icon-wrap">
+                    <i class="fa-solid fa-user input-icon"></i>
+                    <input type="text" name="username" id="id_username" required placeholder="Enter username" class="form-input icon-indent">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_password" class="form-label">Password</label>
+                <div class="password-input-wrap">
+                    <input type="password" name="password" id="id_password" required placeholder="Enter password" class="form-input">
+                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('id_password', this)"><i class="fa-solid fa-eye"></i></button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg mt-4"><i class="fa-solid fa-right-to-bracket"></i> Log In</button>
+        </form>
+
+        <div class="auth-card-footer text-center mt-4">
+            <p>Don't have an account yet? <a href="{% url 'register' %}" class="accent-link">Sign up now</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

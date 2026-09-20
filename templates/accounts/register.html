@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create an Account | EventHub{% endblock %}
+
+{% block content %}
+<div class="auth-page-container">
+    <div class="auth-card">
+        <div class="auth-card-header text-center">
+            <a href="{% url 'home' %}" class="auth-logo"><i class="fa-solid fa-ticket-simple"></i> Event<span class="accent-text">Hub</span></a>
+            <h2>Join EventHub</h2>
+            <p>Create an account to register for events or host your own experiences</p>
+        </div>
+
+        <form method="POST" action="{% url 'register' %}" class="custom-form" id="registerForm">
+            {% csrf_token %}
+
+            <!-- Role Selector -->
+            <div class="role-selector-group">
+                <label class="form-label">I want to join as: <span class="required-asterisk">*</span></label>
+                <div class="role-options-grid">
+                    <label class="role-radio-card active" id="roleParticipantLabel">
+                        <input type="radio" name="role" value="participant" checked onclick="toggleRoleFields('participant')">
+                        <div class="role-content">
+                            <i class="fa-solid fa-user"></i>
+                            <strong>Participant</strong>
+                            <small>Attend & Register for events</small>
+                        </div>
+                    </label>
+
+                    <label class="role-radio-card" id="roleOrganizerLabel">
+                        <input type="radio" name="role" value="organizer" onclick="toggleRoleFields('organizer')">
+                        <div class="role-content">
+                            <i class="fa-solid fa-building-user"></i>
+                            <strong>Organizer</strong>
+                            <small>Create & Host events</small>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Organizer Specific Field -->
+            <div class="form-group hidden" id="organizerNameGroup">
+                <label for="organization_name" class="form-label">Organization / Company Name <span class="required-asterisk">*</span></label>
+                <input type="text" name="organization_name" id="organization_name" placeholder="e.g. Tech Innovators Inc." class="form-input">
+                {% if form.organization_name.errors %}<div class="form-error">{{ form.organization_name.errors }}</div>{% endif %}
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group col-span-half">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">Username <span class="required-asterisk">*</span></label>
+                    <input type="text" name="username" value="{{ form.username.value|default:'' }}" id="{{ form.username.id_for_label }}" required placeholder="e.g. alex2026" class="form-input">
+                    {% if form.username.errors %}<div class="form-error">{{ form.username.errors }}</div>{% endif %}
+                </div>
+
+                <div class="form-group col-span-half">
+                    <label for="{{ form.email.id_for_label }}" class="form-label">Email Address <span class="required-asterisk">*</span></label>
+                    <input type="email" name="email" value="{{ form.email.value|default:'' }}" id="{{ form.email.id_for_label }}" required placeholder="alex@example.com" class="form-input">
+                    {% if form.email.errors %}<div class="form-error">{{ form.email.errors }}</div>{% endif %}
+                </div>
+
+                <div class="form-group col-span-half">
+                    <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                    <input type="text" name="first_name" value="{{ form.first_name.value|default:'' }}" id="{{ form.first_name.id_for_label }}" placeholder="Alex" class="form-input">
+                </div>
+
+                <div class="form-group col-span-half">
+                    <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                    <input type="text" name="last_name" value="{{ form.last_name.value|default:'' }}" id="{{ form.last_name.id_for_label }}" placeholder="Morgan" class="form-input">
+                </div>
+
+                <div class="form-group col-span-full">
+                    <label for="phone" class="form-label">Phone Number</label>
+                    <input type="text" name="phone" id="phone" placeholder="+1 (555) 019-2834" class="form-input">
+                </div>
+
+                <div class="form-group col-span-half">
+                    <label for="password" class="form-label">Password <span class="required-asterisk">*</span></label>
+                    <div class="password-input-wrap">
+                        <input type="password" name="password" id="password" required placeholder="Choose strong password" class="form-input">
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password', this)"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                    {% if form.password.errors %}<div class="form-error">{{ form.password.errors }}</div>{% endif %}
+                </div>
+
+                <div class="form-group col-span-half">
+                    <label for="confirm_password" class="form-label">Confirm Password <span class="required-asterisk">*</span></label>
+                    <div class="password-input-wrap">
+                        <input type="password" name="confirm_password" id="confirm_password" required placeholder="Re-enter password" class="form-input">
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('confirm_password', this)"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                    {% if form.confirm_password.errors %}<div class="form-error">{{ form.confirm_password.errors }}</div>{% endif %}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg mt-4"><i class="fa-solid fa-user-plus"></i> Complete Registration</button>
+        </form>
+
+        <div class="auth-card-footer text-center mt-4">
+            <p>Already have an account? <a href="{% url 'login' %}" class="accent-link">Log in here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleRoleFields(role) {
+    const orgGroup = document.getElementById('organizerNameGroup');
+    const orgLabel = document.getElementById('roleOrganizerLabel');
+    const partLabel = document.getElementById('roleParticipantLabel');
+
+    if (role === 'organizer') {
+        orgGroup.classList.remove('hidden');
+        document.getElementById('organization_name').setAttribute('required', 'required');
+        orgLabel.classList.add('active');
+        partLabel.classList.remove('active');
+    } else {
+        orgGroup.classList.add('hidden');
+        document.getElementById('organization_name').removeAttribute('required');
+        partLabel.classList.add('active');
+        orgLabel.classList.remove('active');
+    }
+}
+</script>
+{% endblock %}

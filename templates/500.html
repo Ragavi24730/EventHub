@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}500 Server Error | EventHub{% endblock %}
+
+{% block content %}
+<div class="container section-padding">
+    <div class="error-page-card">
+        <div class="error-code text-pink">500</div>
+        <h1 class="error-title">Server Error</h1>
+        <p class="error-desc">Something went wrong on our server. Don't worry, our team is looking into it!</p>
+        <div class="error-actions">
+            <a href="{% url 'home' %}" class="btn btn-primary btn-lg"><i class="fa-solid fa-house"></i> Return to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

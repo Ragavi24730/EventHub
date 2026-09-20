@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ event.title }} | EventHub{% endblock %}
+
+{% block content %}
+<div class="event-detail-header-banner">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="{% url 'home' %}">Home</a> &rsaquo; 
+            <a href="{% url 'event_list' %}">Events</a> &rsaquo; 
+            <span>{{ event.title }}</span>
+        </div>
+        <div class="event-header-flex">
+            <div>
+                <span class="category-pill"><i class="fa-solid fa-tag"></i> {{ event.category.name|default:'General' }}</span>
+                <h1 class="event-detail-title">{{ event.title }}</h1>
+                <p class="event-organizer-lead">Organized by <strong>{{ event.organizer.organizer_profile.organization_name|default:event.organizer.get_full_name|default:event.organizer.username }}</strong></p>
+            </div>
+            {% if user == event.organizer or user.is_superuser %}
+                <div class="organizer-quick-actions">
+                    <a href="{% url 'edit_event' slug=event.slug %}" class="btn btn-warning"><i class="fa-solid fa-pen-to-square"></i> Edit Event</a>
+                    <a href="{% url 'event_participants' slug=event.slug %}" class="btn btn-info"><i class="fa-solid fa-users"></i> View Roster</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="container section-padding">
+    <div class="event-detail-grid">
+        <!-- Main Details Left Column -->
+        <div class="event-detail-main">
+            <div class="event-main-image-wrap">
+                {% if event.image %}
+                    <img src="{{ event.image.url }}" alt="{{ event.title }}" class="event-detail-img">
+                {% else %}
+                    <img src="{% static 'images/event_placeholder.jpg' %}" alt="{{ event.title }}" class="event-detail-img">
+                {% endif %}
+            </div>
+
+            <div class="detail-card">
+                <h2 class="detail-card-heading"><i class="fa-solid fa-align-left"></i> About This Event</h2>
+                <div class="event-description-body">
+                    {{ event.description|linebreaks }}
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <h2 class="detail-card-heading"><i class="fa-solid fa-building"></i> Organizer Details</h2>
+                <div class="organizer-profile-box">
+                    <div class="org-avatar">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <div class="org-info">
+                        <h3>{{ event.organizer.organizer_profile.organization_name|default:event.organizer.username }}</h3>
+                        {% if event.organizer.organizer_profile.organization_description %}
+                            <p>{{ event.organizer.organizer_profile.organization_description }}</p>
+                        {% endif %}
+                        {% if event.organizer.organizer_profile.website %}
+                            <a href="{{ event.organizer.organizer_profile.website }}" target="_blank" class="org-link"><i class="fa-solid fa-globe"></i> Visit Website</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Right Column -->
+        <div class="event-detail-sidebar">
+            <div class="registration-sticky-card">
+                <div class="price-header-row">
+                    <span class="price-label">Registration Price</span>
+                    <span class="price-value">
+                        {% if event.is_free %}
+                            <span class="badge badge-success text-lg">FREE</span>
+                        {% else %}
+                            <span class="accent-text text-xl">${{ event.price }}</span>
+                        {% endif %}
+                    </span>
+                </div>
+
+                <hr class="card-divider">
+
+                <div class="event-spec-list">
+                    <div class="spec-item">
+                        <i class="fa-regular fa-calendar-check spec-icon"></i>
+                        <div>
+                            <strong>Date</strong>
+                            <p>{{ event.date|date:"F j, Y" }}</p>
+                        </div>
+                    </div>
+                    <div class="spec-item">
+                        <i class="fa-regular fa-clock spec-icon"></i>
+                        <div>
+                            <strong>Time</strong>
+                            <p>{{ event.start_time|time:"P" }} - {{ event.end_time|time:"P" }}</p>
+                        </div>
+                    </div>
+                    <div class="spec-item">
+                        <i class="fa-solid fa-location-dot spec-icon"></i>
+                        <div>
+                            <strong>Location / Venue</strong>
+                            <p>{{ event.location }}</p>
+                        </div>
+                    </div>
+                    <div class="spec-item">
+                        <i class="fa-solid fa-chair spec-icon"></i>
+                        <div>
+                            <strong>Available Capacity</strong>
+                            <p><span class="badge {% if event.available_seats <= 5 %}badge-pink{% else %}badge-purple{% endif %}">{{ event.available_seats }} Seats Remaining</span> (Total {{ event.capacity }})</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registration Actions -->
+                <div class="registration-action-box">
+                    {% if user.is_authenticated %}
+                        {% if is_registered %}
+                            <div class="already-registered-box">
+                                <div class="badge badge-success-lg"><i class="fa-solid fa-circle-check"></i> You Are Registered</div>
+                                <p class="small-text mt-2">Your ticket is active and ready to download/print.</p>
+                                {% if user_registration.ticket %}
+                                    <a href="{% url 'ticket_detail' ticket_id=user_registration.ticket.ticket_id %}" class="btn btn-primary btn-block mt-3"><i class="fa-solid fa-ticket"></i> View Digital Ticket</a>
+                                {% endif %}
+                            </div>
+                        {% elif event.is_full %}
+                            <button class="btn btn-disabled btn-block btn-lg" disabled>
+                                <i class="fa-solid fa-ban"></i> Event Full (No Seats Available)
+                            </button>
+                        {% else %}
+                            <form action="{% url 'register_event' slug=event.slug %}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary btn-block btn-lg" onclick="return confirm('Confirm registration for {{ event.title }}?');">
+                                    <i class="fa-solid fa-ticket"></i> Register Now
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary btn-block btn-lg">
+                            <i class="fa-solid fa-right-to-bracket"></i> Login to Register
+                        </a>
+                        <p class="text-center small-text mt-2">Don't have an account? <a href="{% url 'register' %}">Sign up here</a></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
