@@ -4,7 +4,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Secure SECRET_KEY configuration (reads from Vercel/production env, defaults to dev key locally)
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-m3qnf*^r5-$-++wc88+(u)h5e*w#wqy-jn^vdw7v##l-ba=s--')
 
 # DEBUG mode: False automatically on Vercel deployment, True for local development
 IS_VERCEL = 'VERCEL' in os.environ
@@ -15,6 +15,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '.vercel.app',
+    '*',
 ]
 
 INSTALLED_APPS = [
